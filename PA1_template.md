@@ -11,7 +11,8 @@ keep_md: true
 
 2. Filter out NA value for steps from 'rawData'. There are total 2304 NA values. Keep the processed dataFrame in 'df'.
 
-```{r, echo=TRUE}
+
+```r
 #
 #set work directory
 #
@@ -26,9 +27,21 @@ rawData <- read.csv(file="activity.csv", header=TRUE, sep=",")
 summary(rawData)
 ```
 
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
+```
+
 There are 2304 NA values. We need filter out NA records for data analysis.
 
-```{r, echo=TRUE}
+
+```r
 df <- subset(rawData, !is.na(rawData$steps))
 ```
 
@@ -36,7 +49,8 @@ df <- subset(rawData, !is.na(rawData$steps))
 ## What is mean total number of steps taken per day?
 Apply ddply() function from package {plyr} on dataFrame 'df' to do summarise.
 
-```{r, echo=TRUE}
+
+```r
 library(plyr)
 #
 #apply ddply function to dataFrame df on 'date' to do summarise
@@ -46,18 +60,31 @@ totalSteps <- ddply(df, .(date), summarise, mean=mean(steps), median=median(step
 #use hist() to create Histogram for total steps
 #
 hist(as.numeric(totalSteps$sum), main="Histogram for total steps", xlab="Total steps", ylab="Frequency of total steps",border="blue", col="green")
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
+
+```r
 #
 #use plot() to create graph for average and median steps per date
 #
 plot(totalSteps$date, totalSteps$mean, type = "l", main="Average steps for date", xlab="Date", ylab="Average steps")
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-2.png) 
+
+```r
 plot(totalSteps$date, totalSteps$median, type = "l", main="Median steps for date", xlab="Date", ylab="Median steps")
 ```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-3.png) 
 
 ## What is the average daily activity pattern?
 
 Aapply ddply() function to dataFrame 'df' on 'interval' to do summarise
 
-```{r, echo=TRUE}
+
+```r
 #
 #apply ddply function to dataFrame df on 'interval' to do summarise
 #
@@ -66,8 +93,15 @@ averageSteps <- ddply(df, .(interval), summarise, mean=mean(steps), max = max(st
 #use plot() function to create graph for average and median steps per interval
 #
 plot(averageSteps$interval, averageSteps$mean, type = "l", main="Average steps for interval", xlab="Interval", ylab="Average steps")
+```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
+
+```r
 plot(averageSteps$interval, averageSteps$max, type = "l", main="Max steps for interval", xlab="Interval", ylab="Max steps")
 ```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-2.png) 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -76,7 +110,8 @@ plot(averageSteps$interval, averageSteps$max, type = "l", main="Max steps for in
 3. Apply ddply() function on interval and dayType to do summarise;
 4. Use plot() function to create graph for the results.
   
-```{r, echo=TRUE}
+
+```r
 #
 #add a new factor called dayType to df 
 #
@@ -89,8 +124,15 @@ meanWeekEnd <- subset(meanDayType, meanDayType$dayType == "Weekend")
 #use plot() function to create graph
 #
 plot(meanWeekDay$interval, meanWeekDay$mean, type = "l", main="Weekday average steps", xlab="Interval", ylab="Mean steps")
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
+```r
 plot(meanWeekEnd$interval, meanWeekEnd$mean, type = "l", main="Weekend average steps", xlab="Interval", ylab="Mean steps")
 ```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-2.png) 
 
 ## Imputing missing values
 
@@ -102,7 +144,8 @@ The logic is to fill in data with the average value on the same day type by matc
 
 The funtion is built to check each NA item and find the average value by matching the interval and day type (Weekday or Weekend), then reset the steps value.
 
-```{r, echo=TRUE}
+
+```r
 sizeMatch <- length(meanWeekDay$interval)
 getStepsByWeekday <- function(interval) {
     for (j in 1: sizeMatch) {
@@ -139,11 +182,23 @@ totalStepsFix <- ddply(fixData, .(date), summarise, mean=mean(steps), median=med
 #create Hostogram for total steps after fix NA value
 #
 hist(as.numeric(totalStepsFix$sum), main="Histogram for total steps after fix NA", xlab="Total steps", ylab="Frequency of total steps",border="blue", col="green")
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
+
+```r
 #
 #use plot() to create graph for average and median steps after fix NA value
 #
 plot(totalStepsFix$date, totalStepsFix$mean, type = "l", main="Average steps for date after fix NA", xlab="Date", ylab="Average steps")
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png) 
+
+```r
 plot(totalStepsFix$date, totalStepsFix$median, type = "l", main="Median steps for date after fix NA", xlab="Date", ylab="Median steps")
 ```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-3.png) 
 
 
